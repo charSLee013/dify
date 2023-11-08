@@ -1,5 +1,6 @@
 # packages install stage
-FROM python:3.10-slim AS base
+ARG IMAGE="python:3.10-slim"
+FROM $IMAGE AS base
 
 LABEL maintainer="takatost@gmail.com"
 
@@ -8,10 +9,10 @@ RUN apt-get update \
 
 COPY requirements.txt /requirements.txt
 
-RUN pip install --prefix=/pkg -r requirements.txt
+RUN pip install --no-cache-dir --prefix=/pkg -r requirements.txt
 
 # build stage
-FROM python:3.10-slim AS builder
+FROM $IMAGE AS builder
 
 ENV FLASK_APP app.py
 ENV EDITION SELF_HOSTED

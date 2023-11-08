@@ -2,13 +2,16 @@ version: '3.1'
 services:
   # API service
   api:
-    image: langgenius/dify-api:0.3.29
+    image: langgenius/dify-api:latest
+    build:
+      context: ../api/
+      dockerfile: Dockerfile
     restart: always
     environment:
       # Startup mode, 'api' starts the API server.
       MODE: api
       # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
-      LOG_LEVEL: INFO
+      LOG_LEVEL: DEBUG
       # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
       SECRET_KEY: sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U
       # The base URL of console application web frontend, refers to the Console base URL of WEB service if console domain is
@@ -79,7 +82,7 @@ services:
       S3_SECRET_KEY: 'sk-difyai'
       S3_REGION: 'us-east-1'
       # The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
-      VECTOR_STORE: weaviate
+      VECTOR_STORE: milvus
       # The Weaviate endpoint URL. Only available when VECTOR_STORE is `weaviate`.
       WEAVIATE_ENDPOINT: http://weaviate:8080
       # The Weaviate API key.
@@ -90,7 +93,7 @@ services:
       QDRANT_API_KEY: difyai123456
       # Milvus configuration Only available when VECTOR_STORE is `milvus`.
       # The milvus host.
-      MILVUS_HOST: 127.0.0.1
+      MILVUS_HOST: 172.20.171.58
       # The milvus host.
       MILVUS_PORT: 19530
       # The milvus username.
@@ -124,7 +127,7 @@ services:
   # worker service
   # The Celery worker for processing the queue.
   worker:
-    image: langgenius/dify-api:0.3.29
+    image: langgenius/dify-api:latest
     restart: always
     environment:
       # Startup mode, 'worker' starts the Celery worker for processing the queue.
@@ -133,7 +136,7 @@ services:
       # --- All the configurations below are the same as those in the 'api' service. ---
 
       # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
-      LOG_LEVEL: INFO
+      LOG_LEVEL: DEBUG
       # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
       # same as the API service
       SECRET_KEY: sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U
@@ -157,7 +160,7 @@ services:
       STORAGE_TYPE: local
       STORAGE_LOCAL_PATH: storage
       # The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
-      VECTOR_STORE: weaviate
+      VECTOR_STORE: milvus
       # The Weaviate endpoint URL. Only available when VECTOR_STORE is `weaviate`.
       WEAVIATE_ENDPOINT: http://weaviate:8080
       # The Weaviate API key.
@@ -168,7 +171,7 @@ services:
       QDRANT_API_KEY: difyai123456
       # Milvus configuration Only available when VECTOR_STORE is `milvus`.
       # The milvus host.
-      MILVUS_HOST: 127.0.0.1
+      MILVUS_HOST: 172.20.171.58
       # The milvus host.
       MILVUS_PORT: 19530
       # The milvus username.
@@ -192,7 +195,10 @@ services:
 
   # Frontend web application.
   web:
-    image: langgenius/dify-web:0.3.29
+    image: langgenius/dify-web:latest
+    build:
+      context: ../web/
+      dockerfile: Dockerfile
     restart: always
     environment:
       EDITION: SELF_HOSTED
@@ -243,48 +249,6 @@ services:
     command: redis-server --requirepass difyai123456
     healthcheck:
       test: ["CMD", "redis-cli","ping"]
-#    uncomment to expose redis port to host
-#    ports:
-#      - "6379:6379"
-
-  # The Weaviate vector store.
-  weaviate:
-    image: semitechnologies/weaviate:1.18.4
-    restart: always
-    volumes:
-      # Mount the Weaviate data directory to the container.
-      - ./volumes/weaviate:/var/lib/weaviate
-    environment:
-      # The Weaviate configurations
-      # You can refer to the [Weaviate](https://weaviate.io/developers/weaviate/config-refs/env-vars) documentation for more information.
-      QUERY_DEFAULTS_LIMIT: 25
-      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'false'
-      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
-      DEFAULT_VECTORIZER_MODULE: 'none'
-      CLUSTER_HOSTNAME: 'node1'
-      AUTHENTICATION_APIKEY_ENABLED: 'true'
-      AUTHENTICATION_APIKEY_ALLOWED_KEYS: 'WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih'
-      AUTHENTICATION_APIKEY_USERS: 'hello@dify.ai'
-      AUTHORIZATION_ADMINLIST_ENABLED: 'true'
-      AUTHORIZATION_ADMINLIST_USERS: 'hello@dify.ai'
-#    uncomment to expose weaviate port to host
-#    ports:
-#      - "8080:8080"
-
-  # Qdrant vector store.
-#  uncomment to use qdrant as vector store.
-#  (if uncommented, you need to comment out the weaviate service above,
-#  and set VECTOR_STORE to qdrant in the api & worker service.)
-#  qdrant:
-#    image: qdrant/qdrant:latest
-#    restart: always
-#    volumes:
-#      - ./volumes/qdrant:/qdrant/storage
-#    environment:
-#      QDRANT__API_KEY: 'difyai123456'
-##    uncomment to expose qdrant port to host
-##    ports:
-##      - "6333:6333"
 
   # The nginx reverse proxy.
   # used for reverse proxying the API service and Web service.
