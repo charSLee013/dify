@@ -35,8 +35,8 @@ class FileService:
             raise FileTooLargeError(message)
 
         extension = file.filename.split('.')[-1]
-        if extension.lower() not in ALLOWED_EXTENSIONS:
-            raise UnsupportedFileTypeError()
+        # if extension.lower() not in ALLOWED_EXTENSIONS:
+        #     raise UnsupportedFileTypeError()
 
         # user uuid as file name
         file_uuid = str(uuid.uuid4())
