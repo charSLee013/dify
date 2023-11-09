@@ -22,7 +22,7 @@ class AnthropicModel(BaseLLM):
             model=self.name,
             streaming=self.streaming,
             callbacks=self.callbacks,
-            default_request_timeout=60,
+            default_request_timeout=300,
             **self.credentials,
             **provider_model_kwargs
         )

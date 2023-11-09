@@ -96,7 +96,7 @@ class LocalAIProvider(BaseModelProvider):
                         openai_api_key='1',
                         openai_api_base=credentials['server_url'] + '/v1',
                         max_tokens=10,
-                        request_timeout=60,
+                        request_timeout=300,
                     )
 
                     model([HumanMessage(content='ping')])
@@ -106,7 +106,7 @@ class LocalAIProvider(BaseModelProvider):
                         openai_api_key='1',
                         openai_api_base=credentials['server_url'] + '/v1',
                         max_tokens=10,
-                        request_timeout=60,
+                        request_timeout=300,
                     )
 
                     model('ping')
