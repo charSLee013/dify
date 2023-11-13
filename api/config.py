@@ -57,7 +57,8 @@ DEFAULTS = {
     'CLEAN_DAY_SETTING': 30,
     'UPLOAD_FILE_SIZE_LIMIT': 15,
     'UPLOAD_FILE_BATCH_LIMIT': 5,
-    'OUTPUT_MODERATION_BUFFER_SIZE': 300
+    'OUTPUT_MODERATION_BUFFER_SIZE': 300,
+    'QA_MODEL_CONCURRENCY':1
 }
 
 
@@ -232,6 +233,8 @@ class Config:
         # moderation settings
         self.OUTPUT_MODERATION_BUFFER_SIZE = int(get_env('OUTPUT_MODERATION_BUFFER_SIZE'))
 
+        # embedding settings
+        self.QA_MODEL_CONCURRENCY = int(get_env('QA_MODEL_CONCURRENCY'))
 
 class CloudEditionConfig(Config):
 
