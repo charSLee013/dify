@@ -25,9 +25,13 @@ class ProviderService:
         :return:
         """
         # get rules for all providers
-        model_provider_rules = ModelProviderFactory.get_provider_rules()
+        model_provider_rules = ModelProviderFactory.get_provider_rules()    # read all json from dify/api/core/model_providers/rules
         model_provider_names = [model_provider_name for model_provider_name, _ in model_provider_rules.items()]
 
+        """_summary_
+        该循环会检查支持 ProviderType.SYSTEM 并在其 system_config 中有试用配额的提供程序。      
+        如果找到这样的提供程序，就会调用 ModelProviderFactory.get_preferred_model_provider，大概是为了注册或检索租户的首选提供程序。
+        """
         for model_provider_name, model_provider_rule in model_provider_rules.items():
             if ProviderType.SYSTEM.value in model_provider_rule['support_provider_types'] \
                     and 'system_config' in model_provider_rule and model_provider_rule['system_config'] \
@@ -35,6 +39,7 @@ class ProviderService:
                     and 'trial' in model_provider_rule['system_config']['supported_quota_types']:
                 ModelProviderFactory.get_preferred_model_provider(tenant_id, model_provider_name)
 
+        # 找出可配置的模型供应商名称，比如Azure，hugginface,localai,openllm,xinference
         configurable_model_provider_names = [
             model_provider_name
             for model_provider_name, model_provider_rules in model_provider_rules.items()
@@ -42,7 +47,7 @@ class ProviderService:
                and model_provider_rules['model_flexibility'] == 'configurable'
         ]
 
-        # get all providers for the tenant
+        # 获取该租户可用的模型供应商
         providers = db.session.query(Provider) \
             .filter(
             Provider.tenant_id == tenant_id,
@@ -54,7 +59,8 @@ class ProviderService:
         for provider in providers:
             provider_name_to_provider_dict[provider.provider_name].append(provider)
 
-        # get all configurable provider models for the tenant
+        # 获取该租户的所有模型提供商的信息
+        # 内容包括provider_name,model_name,model_type,encrypted_config(如字面意思是加密后)
         provider_models = db.session.query(ProviderModel) \
             .filter(
             ProviderModel.tenant_id == tenant_id,
@@ -76,10 +82,11 @@ class ProviderService:
         provider_name_to_preferred_provider_type_dict = {preferred_provider_type.provider_name: preferred_provider_type
                                                          for preferred_provider_type in preferred_provider_types}
 
+        # 准备返回的模型提供商信息
         providers_list = {}
-
+        # 遍历每个模型提供商和它们的规则
         for model_provider_name, model_provider_rule in model_provider_rules.items():
-            # get preferred provider type
+            # 获取租户首选的提供商类型
             preferred_model_provider = provider_name_to_preferred_provider_type_dict.get(model_provider_name)
             preferred_provider_type = ModelProviderFactory.get_preferred_type_by_preferred_model_provider(
                 tenant_id,
@@ -87,15 +94,20 @@ class ProviderService:
                 preferred_model_provider
             )
 
+            # 记录提供商类型和提供商模型的灵活性
             provider_config_dict = {
                 "preferred_provider_type": preferred_provider_type,
                 "model_flexibility": model_provider_rule['model_flexibility'],
             }
 
+            # 记录每个模型供应商的系统和自定义提供程序类型的参数。
             provider_parameter_dict = {}
+            # 判断模型提供商是否支持system(表示是否支持内置功能)
             if ProviderType.SYSTEM.value in model_provider_rule['support_provider_types']:
+                # 遍历所有可能的配额类型（比如付费、免费、试用），检查当前提供商是否支持这个配额类型。
                 for quota_type_enum in ProviderQuotaType:
                     quota_type = quota_type_enum.value
+                    # 如果支持其中一种，则需要新建一个提供商用来区分
                     if quota_type in model_provider_rule['system_config']['supported_quota_types']:
                         key = ProviderType.SYSTEM.value + ':' + quota_type
                         provider_parameter_dict[key] = {
@@ -111,6 +123,7 @@ class ProviderService:
                             "last_used": None  # need update
                         }
 
+            # 检查当前提供商是否支持自定义类型的服务。
             if ProviderType.CUSTOM.value in model_provider_rule['support_provider_types']:
                 provider_parameter_dict[ProviderType.CUSTOM.value] = {
                     "provider_name": model_provider_name,
@@ -121,14 +134,17 @@ class ProviderService:
                     "last_used": None  # need update
                 }
 
+            # 获取模型提供商类的实例
             model_provider_class = ModelProviderFactory.get_model_provider_class(model_provider_name)
 
+            # 更新上面获得模型提供商每个不同配额的情况(具体情况存储在数据库中)
             current_providers = provider_name_to_provider_dict[model_provider_name]
             for provider in current_providers:
                 if provider.provider_type == ProviderType.SYSTEM.value:
                     quota_type = provider.quota_type
                     key = f'{ProviderType.SYSTEM.value}:{quota_type}'
 
+                    # provider数据来自数据库，如果有记录则将其更新
                     if key in provider_parameter_dict:
                         provider_parameter_dict[key]['is_valid'] = provider.is_valid
                         provider_parameter_dict[key]['quota_used'] = provider.quota_used
@@ -137,16 +153,18 @@ class ProviderService:
                             if provider.last_used else None
                 elif provider.provider_type == ProviderType.CUSTOM.value \
                         and ProviderType.CUSTOM.value in provider_parameter_dict:
-                    # if custom
+                    # 自定义提供商也需要从数据库中更新信息
                     key = ProviderType.CUSTOM.value
                     provider_parameter_dict[key]['last_used'] = int(provider.last_used.timestamp()) \
                             if provider.last_used else None
                     provider_parameter_dict[key]['is_valid'] = provider.is_valid
 
+                    # 如果灵活性为固定(fixed)，则从加密信息获取api-key等配置信息，并且输出要求混淆()
                     if model_provider_rule['model_flexibility'] == 'fixed':
                         provider_parameter_dict[key]['config'] = model_provider_class(provider=provider) \
                             .get_provider_credentials(obfuscated=True)
                     else:
+                        # 如果模型灵活性不是固定的，从数据库中获取配置信息Json格式(部分字段混淆)
                         models = []
                         provider_models = provider_name_to_provider_model_dict[model_provider_name]
                         for provider_model in provider_models:
