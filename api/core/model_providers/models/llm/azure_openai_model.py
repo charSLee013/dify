@@ -44,7 +44,7 @@ class AzureOpenAIModel(BaseLLM):
             client = EnhanceAzureOpenAI(
                 deployment_name=self.name,
                 streaming=self.streaming,
-                request_timeout=60,
+                request_timeout=300,
                 openai_api_type='azure',
                 openai_api_version=AZURE_OPENAI_API_VERSION,
                 openai_api_key=self.credentials.get('openai_api_key'),
@@ -65,7 +65,7 @@ class AzureOpenAIModel(BaseLLM):
                 max_tokens=provider_model_kwargs.get('max_tokens'),
                 model_kwargs=extra_model_kwargs,
                 streaming=self.streaming,
-                request_timeout=60,
+                request_timeout=300,
                 openai_api_type='azure',
                 openai_api_version=AZURE_OPENAI_API_VERSION,
                 openai_api_key=self.credentials.get('openai_api_key'),

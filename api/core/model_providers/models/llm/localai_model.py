@@ -40,7 +40,7 @@ class LocalAIModel(BaseLLM):
                 model_name=self.name,
                 streaming=self.streaming,
                 callbacks=self.callbacks,
-                request_timeout=60,
+                request_timeout=300,
                 openai_api_key="1",
                 openai_api_base=self.credentials['server_url'] + '/v1',
                 **provider_model_kwargs
@@ -57,7 +57,7 @@ class LocalAIModel(BaseLLM):
                 model_kwargs=extra_model_kwargs,
                 streaming=self.streaming,
                 callbacks=self.callbacks,
-                request_timeout=60,
+                request_timeout=300,
                 openai_api_key="1",
                 openai_api_base=self.credentials['server_url'] + '/v1'
             )

@@ -208,6 +208,13 @@ class IndexingRunner:
                                indexing_technique: str = 'economy') -> dict:
         """
         Estimate the indexing for the document.
+        @param `tenant_id`: 字符串类型，表示租户ID。
+        @param `file_details`: 列表类型，每个元素是一个 `UploadFile` 类型的实例，表示文件详情。
+        @param `tmp_processing_rule`: 字典类型，表示临时处理规则，包括 `mode` 和 `rules` 两个键，分别表示处理模式和规则列表。
+        @param `doc_form`: 字符串类型，表示文档形式，可选参数，默认为None。如果为 `qa_model`，则表示文档的形式是问答模型，需要生成问答文档。
+        @param `doc_language`: 字符串类型，表示文档语言，可选参数，默认为英语。
+        @param `dataset_id`: 字符串类型，表示数据集ID，可选参数，默认为None。如果给定，则根据数据集的属性，选择相应的嵌入模型。
+        @param `indexing_technique`: 字符串类型，表示索引技术，可选参数，默认为经济型。如果为高质量型，则选择默认的嵌入模型。
         """
         embedding_model = None
         if dataset_id:
@@ -217,12 +224,14 @@ class IndexingRunner:
             if not dataset:
                 raise ValueError('Dataset not found.')
             if dataset.indexing_technique == 'high_quality' or indexing_technique == 'high_quality':
+                # 根据数据集的属性，从 `ModelFactory` 中获取相应的嵌入模型
                 embedding_model = ModelFactory.get_embedding_model(
                     tenant_id=dataset.tenant_id,
                     model_provider_name=dataset.embedding_model_provider,
                     model_name=dataset.embedding_model
                 )
         else:
+            # 如果没有给定 `dataset_id`，但是 `indexing_technique` 为高质量型，也从 `ModelFactory` 中获取默认的嵌入模型。否则，`embedding_model` 保持为None。
             if indexing_technique == 'high_quality':
                 embedding_model = ModelFactory.get_embedding_model(
                     tenant_id=tenant_id
@@ -234,6 +243,7 @@ class IndexingRunner:
             # load data from file
             text_docs = FileExtractor.load(file_detail)
 
+            # 根据 `tmp_processing_rule` 字典，创建一个 `DatasetProcessRule` 实例，用来表示文档的处理规则。
             processing_rule = DatasetProcessRule(
                 mode=tmp_processing_rule["mode"],
                 rules=json.dumps(tmp_processing_rule["rules"])
@@ -532,9 +542,13 @@ class IndexingRunner:
             all_documents.extend(split_documents)
         # processing qa document
         if document_form == 'qa_model':
-            for i in range(0, len(all_documents), 10):
+            # 从配置文件获取qa分档切割的并发数量
+            concurrency = 1
+            if 'QA_MODEL_CONCURRENCY' in current_app.config:
+                concurrency = current_app.config['QA_MODEL_CONCURRENCY']
+            for i in range(0, len(all_documents), concurrency):
                 threads = []
-                sub_documents = all_documents[i:i + 10]
+                sub_documents = all_documents[i:i + concurrency]
                 for doc in sub_documents:
                     document_format_thread = threading.Thread(target=self.format_qa_document, kwargs={
                         'flask_app': current_app._get_current_object(),

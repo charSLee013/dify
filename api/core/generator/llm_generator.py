@@ -11,7 +11,7 @@ from core.prompt.output_parser.rule_config_generator import RuleConfigGeneratorO
 
 from core.prompt.output_parser.suggested_questions_after_answer import SuggestedQuestionsAfterAnswerOutputParser
 from core.prompt.prompt_template import PromptTemplateParser
-from core.prompt.prompts import CONVERSATION_TITLE_PROMPT, GENERATOR_QA_PROMPT
+from core.prompt.prompts import CONVERSATION_TITLE_PROMPT, GENERATOR_QA_PROMPT,NEW_GENERATOR_QA_PROMPT,NEW_GENERATOR_QA_ZH_PROMPT
 
 
 class LLMGenerator:
@@ -134,7 +134,11 @@ class LLMGenerator:
 
     @classmethod
     def generate_qa_document(cls, tenant_id: str, query, document_language: str):
-        prompt = GENERATOR_QA_PROMPT.format(language=document_language)
+        # prompt = GENERATOR_QA_PROMPT.format(language=document_language)
+        prompt = NEW_GENERATOR_QA_PROMPT.format(language=document_language)
+        # 对中文进行特化
+        if document_language.lower() == "chinese":
+            prompt = NEW_GENERATOR_QA_ZH_PROMPT
 
         model_instance = ModelFactory.get_text_generation_model(
             tenant_id=tenant_id,
@@ -147,7 +151,8 @@ class LLMGenerator:
             PromptMessage(content=prompt, type=MessageType.SYSTEM),
             PromptMessage(content=query)
         ]
-
+        
+        logging.info(f"QA generator query: \n{query}\n")
         response = model_instance.run(prompts)
         answer = response.content
         return answer.strip()

@@ -60,7 +60,8 @@ DEFAULTS = {
     'UPLOAD_FILE_BATCH_LIMIT': 5,
     'UPLOAD_IMAGE_FILE_SIZE_LIMIT': 10,
     'OUTPUT_MODERATION_BUFFER_SIZE': 300,
-    'MULTIMODAL_SEND_IMAGE_FORMAT': 'base64'
+    'MULTIMODAL_SEND_IMAGE_FORMAT': 'base64',
+    'QA_MODEL_CONCURRENCY':1
 }
 
 
@@ -282,6 +283,8 @@ class Config:
         self.HOSTED_MODERATION_ENABLED = get_bool_env('HOSTED_MODERATION_ENABLED')
         self.HOSTED_MODERATION_PROVIDERS = get_env('HOSTED_MODERATION_PROVIDERS')
 
+        # embedding settings
+        self.QA_MODEL_CONCURRENCY = int(get_env('QA_MODEL_CONCURRENCY'))
 
 class CloudEditionConfig(Config):
 

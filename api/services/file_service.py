@@ -27,10 +27,11 @@ class FileService:
     @staticmethod
     def upload_file(file: FileStorage, user: Union[Account, EndUser], only_image: bool = False) -> UploadFile:
         extension = file.filename.split('.')[-1]
-        if extension.lower() not in ALLOWED_EXTENSIONS:
-            raise UnsupportedFileTypeError()
-        elif only_image and extension.lower() not in IMAGE_EXTENSIONS:
-            raise UnsupportedFileTypeError()
+        # allow all files
+#         if extension.lower() not in ALLOWED_EXTENSIONS:
+#             raise UnsupportedFileTypeError()
+#         elif only_image and extension.lower() not in IMAGE_EXTENSIONS:
+#             raise UnsupportedFileTypeError()
 
         # read file content
         file_content = file.read()
