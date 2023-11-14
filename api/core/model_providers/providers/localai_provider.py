@@ -61,7 +61,7 @@ class LocalAIProvider(BaseModelProvider):
         return ModelKwargsRules(
             temperature=KwargRule[float](min=0, max=2, default=0.7, precision=2),
             top_p=KwargRule[float](min=0, max=1, default=1, precision=2),
-            max_tokens=KwargRule[int](min=10, max=4097, default=16, precision=0),
+            max_tokens=KwargRule[int](min=1, max=32000, default=16, precision=0),
         )
 
     @classmethod
