@@ -21,6 +21,8 @@ class LocalAIModel(BaseLLM):
                  model_kwargs: ModelKwargs,
                  streaming: bool = False,
                  callbacks: Callbacks = None):
+        """它确定使用的模型是聊天模型还是完成任务的模型，并设置相应的参数
+        """
         credentials = model_provider.get_model_credentials(
             model_name=name,
             model_type=self.type
@@ -34,6 +36,10 @@ class LocalAIModel(BaseLLM):
         super().__init__(model_provider, name, model_kwargs, streaming, callbacks)
 
     def _init_client(self) -> Any:
+        """
+        基于模型类型（聊天或完成）创建不同的客户端实例：EnhanceOpenAI 或 EnhanceChatOpenAI。
+        它配置了客户端的各种参数，如模型名称、超时时间、API密钥和服务器URL
+        """
         provider_model_kwargs = self._to_model_kwargs_input(self.model_rules, self.model_kwargs)
         if self.model_mode == ModelMode.COMPLETION:
             client = EnhanceOpenAI(
@@ -93,6 +99,9 @@ class LocalAIModel(BaseLLM):
             return max(sum([self._client.get_num_tokens(get_buffer_string([m])) for m in prompts]) - len(prompts), 0)
 
     def _set_model_kwargs(self, model_kwargs: ModelKwargs):
+        """
+        允许动态地设置或更新模型的关键参数，如温度、最大令牌数等。
+        """
         provider_model_kwargs = self._to_model_kwargs_input(self.model_rules, model_kwargs)
         if self.model_mode == ModelMode.COMPLETION:
             for k, v in provider_model_kwargs.items():
@@ -108,6 +117,9 @@ class LocalAIModel(BaseLLM):
             self.client.model_kwargs = extra_model_kwargs
 
     def handle_exceptions(self, ex: Exception) -> Exception:
+        """
+        处理错误
+        """
         if isinstance(ex, openai.error.InvalidRequestError):
             logging.warning("Invalid request to LocalAI API.")
             return LLMBadRequestError(str(ex))
