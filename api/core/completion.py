@@ -388,6 +388,7 @@ class Completion:
         prompt_tokens = model_instance.get_num_tokens(prompt_messages)
         rest_tokens = model_limited_tokens - max_tokens - prompt_tokens
         if rest_tokens < 0:
+            logging.debug(f"prompt: {prompt_messages}\nmodel_limited_tokens: {model_limited_tokens} \t max_tokens: {max_tokens}\tprompt_tokens: {prompt_tokens}\n")
             raise LLMBadRequestError("Query or prefix prompt is too long, you can reduce the prefix prompt, "
                                      "or shrink the max token, or switch to a llm with a larger token limit size.")
 

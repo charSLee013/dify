@@ -30,6 +30,8 @@ class BaseEmbedding(BaseProviderModel):
 
     @property
     def price_config(self) -> dict:
+        """返回货币计算的价格配置的属性。
+        """
         def get_or_default():
             default_price_config = {
                     'completion': decimal.Decimal('0'),
@@ -45,7 +47,8 @@ class BaseEmbedding(BaseProviderModel):
             }
             return price_config
         
-        self._price_config = self._price_config if hasattr(self, '_price_config') else get_or_default()
+        if not hasattr(self, '_price_config'):
+            self._price_config = get_or_default()
 
         logger.debug(f"model: {self.name} price_config: {self._price_config}")
         return self._price_config
