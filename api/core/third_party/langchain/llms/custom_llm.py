@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 class CustomClient(BaseModel):
-    base_url: str
+    server_url: str
     # Additional HTTP headers to send with the request.
     headers: Optional[Dict[str, str]] = None
     # Query parameters to append to the URL.
@@ -35,7 +35,7 @@ class CustomClient(BaseModel):
     def post(self, **request: Any) -> Any:
         """Send a POST request to the custom API server.
         """
-        request_url = self.base_url + "/v1/chat/completions"
+        request_url = self.server_url + "/v1/chat/completions"
         if self.params:
             params_str = '&'.join([f'{k}={v}' for k, v in self.params.items()])
             request_url = f"{request_url}?{params_str}"
@@ -81,12 +81,13 @@ class CustomChatLLM(BaseChatModel):
     """Total probability mass of tokens to consider at each step."""
     streaming: bool = False
     """Whether to stream the response or return it all at once."""
+    completion_type:Optional[str] = None
     class Config:
         """Configuration for this pydantic object."""
         extra = Extra.forbid
         
     """copy from CustomClient"""
-    base_url: str
+    server_url: str
     # Additional HTTP headers to send with the request.
     headers: Optional[Dict[str, str]] = None
     # Query parameters to append to the URL.
@@ -113,13 +114,16 @@ class CustomChatLLM(BaseChatModel):
     def _llm_type(self) -> str:
         """Return type of llm."""
         return "custsomLLM"
-
-    def __init__(self,**data:Any):
+    
+    
+    def __init__(self, **data: Any):
         super().__init__(**data)
-        self._client = CustomClient(base_url=self.base_url,
-                                    headers=self.headers,
-                                    params=self.params,
-                                    timeout=self.timeout)
+        self._client = CustomClient(
+            server_url=self.server_url,
+            headers=self.headers,
+            params=self.params,
+            timeout=self.timeout,
+        )
 
     def _convert_message_to_dict(self, message: BaseMessage) -> dict:
         """Convert a BaseMessage object to a dictionary format suitable for sending to the API server.
@@ -197,6 +201,7 @@ class CustomChatLLM(BaseChatModel):
             params = self._default_params
             params["messages"] = message_dicts
             params.update(kwargs)
+            print(f"params: {params}\t")
             response = self._client.post(**params)
             return self._create_chat_result(response, stop)
 
