@@ -30,11 +30,13 @@ class CustomLLM(BaseLLM):
 
         super().__init__(model_provider, name, model_kwargs, streaming, callbacks)
         
-    def __init_client(self) -> Any:
+    def _init_client(self) -> Any:
         provider_model_kwargs = self._to_model_kwargs_input(self.model_rules, self.model_kwargs)
         
         client = CustomChatLLM(model=self.name,
-                               **provider_model_kwargs)
+                               **provider_model_kwargs,
+                               **self.credentials)
+        return client
         
     def _run(self,messages:List[PromptMessage],
              stop:Optional[List[str]] = None,
@@ -43,6 +45,7 @@ class CustomLLM(BaseLLM):
         prompts = self._get_prompt_from_messages(messages)
         if not isinstance(prompts,list):
             prompts = [prompts]
+        print(f"prompts: {prompts}")
         return self._client.generate([prompts], stop, callbacks)
     
     def get_num_tokens(self, messages: List[PromptMessage]) -> int:
@@ -57,13 +60,12 @@ class CustomLLM(BaseLLM):
     
     def _set_model_kwargs(self, model_kwargs: ModelKwargs):
         """
-        允许动态地设置或更新模型的关键参数，如温度、最大令牌数等。
+        Allow for dynamically setting or updating key parameters of the model, such as temperature, maximum token count, etc.
         """
         provider_model_kwargs = self._to_model_kwargs_input(self.model_rules, model_kwargs)
         for k, v in provider_model_kwargs.items():
             if hasattr(self.client, k):
                 setattr(self.client, k, v)
-                logging.debug(f"update custom {self.nane} model setting {k}: {v}")
 
     def handle_exceptions(self, ex: Exception) -> Exception:
         return LLMBadRequestError(f"CustomLLM: {str(ex)}")
