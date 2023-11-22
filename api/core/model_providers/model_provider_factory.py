@@ -72,6 +72,9 @@ class ModelProviderFactory:
         elif provider_name == 'localai':
             from core.model_providers.providers.localai_provider import LocalAIProvider
             return LocalAIProvider
+        elif provider_name == 'custom':
+            from core.model_providers.providers.custom_provider import CustomProvider
+            return CustomProvider
         else:
             raise NotImplementedError
 
