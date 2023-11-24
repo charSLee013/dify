@@ -21,7 +21,7 @@ def get_mock_provider():
 
 def get_mock_embedding_model(mocker):
     model_name = 'custom/model'
-    server_url = os.environ['CUSTOM_SERVER_URL']
+    server_url = os.environ['CUSTOM_EMBEDDING_SERVER_URL']
     model_provider = CustomProvider(provider=get_mock_provider())
 
     mock_query = MagicMock()
