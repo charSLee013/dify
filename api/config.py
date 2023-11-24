@@ -61,6 +61,7 @@ DEFAULTS = {
     'UPLOAD_IMAGE_FILE_SIZE_LIMIT': 10,
     'OUTPUT_MODERATION_BUFFER_SIZE': 300,
     'MULTIMODAL_SEND_IMAGE_FORMAT': 'base64',
+    'INVITE_EXPIRY_HOURS': 72
     'QA_MODEL_CONCURRENCY':1
 }
 
@@ -91,7 +92,7 @@ class Config:
         # ------------------------
         # General Configurations.
         # ------------------------
-        self.CURRENT_VERSION = "0.3.30"
+        self.CURRENT_VERSION = "0.3.31"
         self.COMMIT_SHA = get_env('COMMIT_SHA')
         self.EDITION = "SELF_HOSTED"
         self.DEPLOY_ENV = get_env('DEPLOY_ENV')
@@ -219,6 +220,11 @@ class Config:
         self.MAIL_TYPE = get_env('MAIL_TYPE')
         self.MAIL_DEFAULT_SEND_FROM = get_env('MAIL_DEFAULT_SEND_FROM')
         self.RESEND_API_KEY = get_env('RESEND_API_KEY')
+        
+        # ------------------------
+        # Workpace Configurations.
+        # ------------------------
+        self.INVITE_EXPIRY_HOURS = int(get_env('INVITE_EXPIRY_HOURS'))
 
         # ------------------------
         # Sentry Configurations.
