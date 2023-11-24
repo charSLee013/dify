@@ -201,7 +201,6 @@ class CustomChatLLM(BaseChatModel):
             params = self._default_params
             params["messages"] = message_dicts
             params.update(kwargs)
-            print(f"params: {params}\t")
             response = self._client.post(**params)
             return self._create_chat_result(response, stop)
 

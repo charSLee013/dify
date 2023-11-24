@@ -45,7 +45,6 @@ class CustomLLM(BaseLLM):
         prompts = self._get_prompt_from_messages(messages)
         if not isinstance(prompts,list):
             prompts = [prompts]
-        print(f"prompts: {prompts}")
         return self._client.generate([prompts], stop, callbacks)
     
     def get_num_tokens(self, messages: List[PromptMessage]) -> int:
