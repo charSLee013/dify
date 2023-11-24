@@ -21,8 +21,6 @@ class CustomEmbeddings(BaseModel, Embeddings):
     headers: Optional[Dict[str, str]] = None  # Additional HTTP headers to send with the request.
     params: Optional[Dict[str, str]] = None  # Query parameters to append to the URL.
 
-    class Config:
-        extra = Extra.forbid 
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         """Embeds a list of documents by sending a single HTTP request with the specified headers and parameters.
