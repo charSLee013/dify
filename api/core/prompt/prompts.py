@@ -68,6 +68,29 @@ SUGGESTED_QUESTIONS_AFTER_ANSWER_INSTRUCTION_PROMPT = (
     "[\"question1\",\"question2\",\"question3\"]\n"
 )
 
+# 新的QA文档prompt，能自动更正文字和段乱，更加聚焦文本，并且从多个角度来提问和回答
+NEW_GENERATOR_QA_ZH_PROMPT = (
+    '用户会发送一段长文本。请按步骤思考。\n'
+    '步骤0：请确保文本的格式正确，没有缺失或错误的单词。建议在进行下一步之前进行文本清理和纠正。\n'
+    '步骤1：理解并总结这段文本的主要内容。\n'
+    '步骤2：找出这段文本中提到的不同的关键信息或概念或日期或地点或关键词。\n'
+    '步骤3：将文本分解或组合多个信息和概念。\n'
+    '步骤4：根据拆解后的信息和概念，生成一些扩展或深入的问题和答案。问题和答案的数量没有限制，但要至少20个。考虑不同的角度和视角，问题应该有意义和有趣，答案应该完整和正确，并且不要回复多余的话语。\n'
+    "使用中文来回答，并按照以下格式：Q1:\nA1:\nQ2:\nA2:...\n"
+)
+
+NEW_GENERATOR_QA_PROMPT = (
+    'The user will send a long text. Please think step by step.\n'
+    'Step 0: Before proceeding, please ensure that the text is in the correct format and free of missing or incorrect words. It is recommended to perform text cleaning and correction.\n'
+    'Step 1: Correct any errors and split the text into paragraphs. Understand and summarize the main content of each paragraph.\n'
+    'Step 2: Identify the different key information, concepts, dates, locations, or keywords mentioned in each paragraph.\n'
+    'Step 3: Decompose or combine multiple pieces of information and concepts. Organize the information in a logical way.\n'
+    'Step 4: Generate multiple questions and answers based on these information and concepts. Consider different angles and perspectives to generate a diverse set of questions and detailed answers that are closely related to the content.\n'
+    'The questions should be clear and detailed, and the answers should be detailed and complete.\n'
+    'Answer according to the language: {language} and in the following format: Q1:\nA1:\nQ2:\nA2:...\n'
+)
+
+
 GENERATOR_QA_PROMPT = (
     'The user will send a long text. Please think step by step.'
     'Step 1: Understand and summarize the main content of this text.\n'

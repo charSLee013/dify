@@ -61,7 +61,7 @@ class LocalAIProvider(BaseModelProvider):
         return ModelKwargsRules(
             temperature=KwargRule[float](min=0, max=2, default=0.7, precision=2),
             top_p=KwargRule[float](min=0, max=1, default=1, precision=2),
-            max_tokens=KwargRule[int](min=10, max=4097, default=16, precision=0),
+            max_tokens=KwargRule[int](min=1, max=32000, default=16, precision=0),
         )
 
     @classmethod
@@ -96,7 +96,7 @@ class LocalAIProvider(BaseModelProvider):
                         openai_api_key='1',
                         openai_api_base=credentials['server_url'] + '/v1',
                         max_tokens=10,
-                        request_timeout=60,
+                        request_timeout=300,
                     )
 
                     model([HumanMessage(content='ping')])
@@ -106,7 +106,7 @@ class LocalAIProvider(BaseModelProvider):
                         openai_api_key='1',
                         openai_api_base=credentials['server_url'] + '/v1',
                         max_tokens=10,
-                        request_timeout=60,
+                        request_timeout=300,
                     )
 
                     model('ping')

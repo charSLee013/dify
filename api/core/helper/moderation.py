@@ -10,6 +10,7 @@ from models.provider import ProviderType
 
 
 def check_moderation(model_provider: BaseModelProvider, text: str) -> bool:
+    # 如果开启内容审查和开通了openai，则审核输入文本内容是否合规
     if hosted_config.moderation.enabled is True and hosted_model_providers.openai:
         if model_provider.provider.provider_type == ProviderType.SYSTEM.value \
                 and model_provider.provider_name in hosted_config.moderation.providers:

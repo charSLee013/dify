@@ -140,11 +140,8 @@ web/.vscode/settings.json
 api/.env
 api/storage/*
 
-docker/volumes/app/storage/*
-docker/volumes/db/data/*
-docker/volumes/redis/data/*
-docker/volumes/weaviate/*
-docker/volumes/qdrant/*
+# ignore docker storage path
+docker/volumes/*
 
 sdks/python-client/build
 sdks/python-client/dist

@@ -115,7 +115,7 @@ class AnthropicProvider(BaseModelProvider):
                 model='claude-instant-1',
                 max_tokens_to_sample=10,
                 temperature=0,
-                default_request_timeout=60,
+                default_request_timeout=300,
                 **credential_kwargs
             )
 

@@ -72,7 +72,7 @@ class OpenAIModel(BaseLLM):
                 model_name=self.name,
                 streaming=self.streaming,
                 callbacks=self.callbacks,
-                request_timeout=60,
+                request_timeout=300,
                 **self.credentials,
                 **provider_model_kwargs
             )
@@ -94,7 +94,7 @@ class OpenAIModel(BaseLLM):
                 model_kwargs=extra_model_kwargs,
                 streaming=self.streaming,
                 callbacks=self.callbacks,
-                request_timeout=60,
+                request_timeout=300,
                 **self.credentials
             )
 
@@ -203,7 +203,7 @@ class OpenAIModel(BaseLLM):
     #         result = openai.Model.retrieve(
     #             id=self.name,
     #             api_key=credentials.get('openai_api_key'),
-    #             request_timeout=60
+    #             request_timeout=300
     #         )
     #
     #         if 'id' not in result or result['id'] != self.name:
