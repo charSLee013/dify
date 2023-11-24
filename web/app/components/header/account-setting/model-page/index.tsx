@@ -75,6 +75,7 @@ const ModelPage = () => {
       config.xinference,
       config.openllm,
       config.localai,
+      config.custom,
     ]
   }
   else {
@@ -93,6 +94,7 @@ const ModelPage = () => {
       config.xinference,
       config.openllm,
       config.localai,
+      config.custom,
     ]
   }
 

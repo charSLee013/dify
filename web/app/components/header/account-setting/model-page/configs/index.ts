@@ -11,6 +11,7 @@ import chatglm from './chatglm'
 import xinference from './xinference'
 import openllm from './openllm'
 import localai from './localai'
+import custom from './custom'
 import zhipuai from './zhipuai'
 import baichuan from './baichuan'
 import cohere from './cohere'
@@ -32,4 +33,5 @@ export default {
   zhipuai,
   baichuan,
   cohere,
+  custom,
 }
