@@ -253,6 +253,9 @@ services:
     command: redis-server --requirepass difyai123456
     healthcheck:
       test: ["CMD", "redis-cli","ping"]
+#    uncomment to expose redis port to host
+#    ports:
+#      - "6379:6379"
 
   # The nginx reverse proxy.
   # used for reverse proxying the API service and Web service.
@@ -267,7 +270,6 @@ services:
       - web
     ports:
       - "80:80"
-
 # about milvus 
   etcd:
     container_name: milvus-etcd
