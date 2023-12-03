@@ -61,7 +61,8 @@ DEFAULTS = {
     'UPLOAD_IMAGE_FILE_SIZE_LIMIT': 10,
     'OUTPUT_MODERATION_BUFFER_SIZE': 300,
     'MULTIMODAL_SEND_IMAGE_FORMAT': 'base64',
-    'INVITE_EXPIRY_HOURS': 72
+    'INVITE_EXPIRY_HOURS': 72,
+    'QA_SEGMENT_CONCURRENCY':2
 }
 
 
@@ -287,6 +288,9 @@ class Config:
 
         self.HOSTED_MODERATION_ENABLED = get_bool_env('HOSTED_MODERATION_ENABLED')
         self.HOSTED_MODERATION_PROVIDERS = get_env('HOSTED_MODERATION_PROVIDERS')
+
+        # embedding settings
+        self.QA_SEGMENT_CONCURRENCY = int(get_env('QA_SEGMENT_CONCURRENCY'))
 
 
 class CloudEditionConfig(Config):

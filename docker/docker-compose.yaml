@@ -115,6 +115,8 @@ services:
       SENTRY_TRACES_SAMPLE_RATE: 1.0
       # The sample rate for Sentry profiles. Default: `1.0`
       SENTRY_PROFILES_SAMPLE_RATE: 1.0
+      # Limit the concurrency of QA queries. Default: `2`
+      QA_SEGMENT_CONCURRENCY: 2
     depends_on:
       - db
       - redis
@@ -187,6 +189,8 @@ services:
       MAIL_DEFAULT_SEND_FROM: 'YOUR EMAIL FROM (eg: no-reply <no-reply@dify.ai>)'
       # the api-key for resend (https://resend.com)
       RESEND_API_KEY: ''
+      # Limit the concurrency of QA queries. Default: `2`
+      QA_SEGMENT_CONCURRENCY: 2
     depends_on:
       - db
       - redis

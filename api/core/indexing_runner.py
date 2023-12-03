@@ -532,9 +532,13 @@ class IndexingRunner:
             all_documents.extend(split_documents)
         # processing qa document
         if document_form == 'qa_model':
-            for i in range(0, len(all_documents), 10):
+            # limit the concurrency of QA queries.
+            concurrency = 2
+            if 'QA_SEGMENT_CONCURRENCY' in current_app.config:
+                concurrency = current_app.config['QA_SEGMENT_CONCURRENCY']
+            for i in range(0, len(all_documents), concurrency):
                 threads = []
-                sub_documents = all_documents[i:i + 10]
+                sub_documents = all_documents[i:i + concurrency]
                 for doc in sub_documents:
                     document_format_thread = threading.Thread(target=self.format_qa_document, kwargs={
                         'flask_app': current_app._get_current_object(),
